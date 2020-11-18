@@ -1,6 +1,9 @@
 package tb.archc.scoreboard.functionalUnits;
 
+import tb.archc.scoreboard.Operation;
 import tb.archc.scoreboard.storage.FpRegister;
+import tb.archc.scoreboard.storage.IntRegister;
+import tb.archc.scoreboard.storage.StorageLocation;
 
 public class FloatAddFU extends FunctionalUnit {
 
@@ -9,19 +12,25 @@ public class FloatAddFU extends FunctionalUnit {
 		this.countToComplete = 2;
 	}
 
-	public void add(FpRegister destination, FpRegister sourceLeft, FpRegister sourceRight) {
+
+	@Override
+	public void execute(Operation operation, StorageLocation destination, StorageLocation sourceLeft,
+			StorageLocation sourceRight) {
+		
 		this.setDestination(destination);
 		this.setSourceLeft(sourceLeft);
 		this.setSourceRight(sourceRight);
 		this.startOperation();
-		destination.setValue(sourceLeft.getValue() + sourceRight.getValue());
-	}
+		switch (operation) {
+		case ADD:
+			((FpRegister)destination).setValue(((FpRegister)sourceLeft).getValue() + ((FpRegister)sourceRight).getValue());
+			break;
+		case SUBTRACT:
+			((FpRegister)destination).setValue(((FpRegister)sourceLeft).getValue() - ((FpRegister)sourceRight).getValue());
+			break;
+		default:
+			break;
+		}
 	
-	public void subtract(FpRegister destination, FpRegister sourceLeft, FpRegister sourceRight) {
-		this.setDestination(destination);
-		this.setSourceLeft(sourceLeft);
-		this.setSourceRight(sourceRight);
-		this.startOperation();
-		destination.setValue(sourceLeft.getValue() - sourceRight.getValue());
 	}
 }

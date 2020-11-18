@@ -2,31 +2,24 @@ package tb.archc.scoreboard;
 
 import tb.archc.scoreboard.storage.*;
 import tb.archc.scoreboard.functionalUnits.*;
+import java.io.*;
+import java.util.ArrayList;
 
 public class Simulator {
 
 	public Simulator() {
-		for (int i = 0; i < 32; i++) {
-			intRegisters[i] = new IntRegister("$" + i);
-			fpRegisters[i] = new FpRegister("F" + i);
-		}
 		
-		for (int i = 0; i < 19; i++) {
-			memLocation[i] = new MemoryLocation("(" + i + ")", i);
-		}
 	}
 	
+	public static Hardware getHardware() {
+		if (hardware == null) {
+			hardware = new Hardware();
+		}
+		return hardware;
+	}
+
 	private static String filename;
-	
-	private FpRegister fpRegisters[] = new FpRegister [32];
-	private IntRegister intRegisters[] = new IntRegister [32];
-	private MemoryLocation memLocation[] = new MemoryLocation[19];
-	
-	private IntegerFU integerFU = new IntegerFU();
-	private FloatAddFU floatAddFU = new FloatAddFU();
-	private FloatMultiplierFU floatMultiplierFU = new FloatMultiplierFU();
-	private FloatDividerFU floatDividerFU = new FloatDividerFU();
-	
+	private static Hardware hardware = null;
 	
 	public static void main(String[] args) {
 		if (args.length > 0) {
@@ -42,7 +35,31 @@ public class Simulator {
 	}
 
 	public void run() {
+		ArrayList<String>instructions = parseFile();
+		
 		
 	}
+	
+	public ArrayList<String> parseFile() {
+		ArrayList<String> instructions = new ArrayList<String>(); 
+		File mips = new File(filename);
+		try {
+			FileReader fr = new FileReader(mips);
+			BufferedReader br = new BufferedReader(fr);
+			//StringBuffer sb = new StringBuffer();
+			String line;
+			while((line=br.readLine())!=null) {
+				instructions.add(line);
+			}
+			br.close();
+			fr.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return instructions;
+	}
+	
 	
 }

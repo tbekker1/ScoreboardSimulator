@@ -1,8 +1,10 @@
 package tb.archc.scoreboard.functionalUnits;
 
+import tb.archc.scoreboard.Operation;
 import tb.archc.scoreboard.storage.FpRegister;
 import tb.archc.scoreboard.storage.IntRegister;
 import tb.archc.scoreboard.storage.MemoryLocation;
+import tb.archc.scoreboard.storage.StorageLocation;
 
 public class IntegerFU extends FunctionalUnit {
 	public IntegerFU() {
@@ -10,44 +12,31 @@ public class IntegerFU extends FunctionalUnit {
 		this.countToComplete = 1;
 	}
 
-	public void load(FpRegister destination, MemoryLocation source) {
-		this.setDestination(destination);
-		this.setSourceLeft(source);
-		this.setSourceRight(null);
-		this.startOperation();
-		destination.setValue(source.read());
-	}
-	
-	public void store(MemoryLocation destination, FpRegister source) {
-		this.setDestination(destination);
-		this.setSourceLeft(source);
-		this.setSourceRight(null);
-		this.startOperation();
-		destination.write(source.getValue());
-	}
-	
-	public void add(IntRegister destination, IntRegister sourceLeft, IntRegister sourceRight) {
+	@Override
+	public void execute(Operation operation, StorageLocation destination, StorageLocation sourceLeft,
+			StorageLocation sourceRight) {
+		
 		this.setDestination(destination);
 		this.setSourceLeft(sourceLeft);
 		this.setSourceRight(sourceRight);
 		this.startOperation();
-		destination.setValue(sourceLeft.getValue() + sourceRight.getValue());
-	}
-	
-	public void add(IntRegister destination, IntRegister sourceLeft, int immediate) {
-		this.setDestination(destination);
-		this.setSourceLeft(sourceLeft);
-		this.setSourceRight(null);
-		this.startOperation();
-		destination.setValue(sourceLeft.getValue() + immediate);
-	}
-	
-	public void subtract(IntRegister destination, IntRegister sourceLeft, IntRegister sourceRight) {
-		this.setDestination(destination);
-		this.setSourceLeft(sourceLeft);
-		this.setSourceRight(sourceRight);
-		this.startOperation();
-		destination.setValue(sourceLeft.getValue() - sourceRight.getValue());
+		switch (operation) {
+		case LOAD:
+			((FpRegister)destination).setValue(((MemoryLocation)sourceLeft).read());
+			break;
+		case STORE:
+			((MemoryLocation)destination).write(((FpRegister)sourceLeft).getValue());
+			break;
+		case ADD:
+			((IntRegister)destination).setValue(((IntRegister)sourceLeft).getValue() + ((IntRegister)sourceRight).getValue());
+			break;
+		case SUBTRACT:
+			((IntRegister)destination).setValue(((IntRegister)sourceLeft).getValue() - ((IntRegister)sourceRight).getValue());
+			break;
+		default:
+			break;
+		}
+			
 	}
 	
 	

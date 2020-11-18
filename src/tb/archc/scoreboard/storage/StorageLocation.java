@@ -5,6 +5,7 @@ public abstract class StorageLocation {
 		super();
 		this.name = name;
 	}
+	
 	private String name;
 	private boolean readOK;
 	private boolean writeOK;

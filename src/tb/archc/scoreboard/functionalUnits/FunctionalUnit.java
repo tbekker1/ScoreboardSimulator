@@ -1,5 +1,6 @@
 package tb.archc.scoreboard.functionalUnits;
 
+import tb.archc.scoreboard.Operation;
 import tb.archc.scoreboard.storage.StorageLocation;
 
 public abstract class FunctionalUnit {
@@ -9,6 +10,8 @@ public abstract class FunctionalUnit {
 	private StorageLocation destination;
 	private StorageLocation sourceLeft;
 	private StorageLocation sourceRight;
+	
+    public abstract void execute(Operation operation, StorageLocation destination, StorageLocation sourceLeft, StorageLocation sourceRight);
 	
 	public boolean isBusy() {
 		return busy;

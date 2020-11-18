@@ -1,6 +1,8 @@
 package tb.archc.scoreboard.functionalUnits;
 
+import tb.archc.scoreboard.Operation;
 import tb.archc.scoreboard.storage.FpRegister;
+import tb.archc.scoreboard.storage.StorageLocation;
 
 public class FloatDividerFU extends FunctionalUnit {
 
@@ -9,12 +11,16 @@ public class FloatDividerFU extends FunctionalUnit {
 		this.countToComplete = 40;
 	}
 
-	public void divide(FpRegister destination, FpRegister sourceLeft, FpRegister sourceRight) {
+	@Override
+	public void execute(Operation operation, StorageLocation destination, StorageLocation sourceLeft,
+			StorageLocation sourceRight) {
+	
 		this.setDestination(destination);
 		this.setSourceLeft(sourceLeft);
 		this.setSourceRight(sourceRight);
 		this.startOperation();
-		destination.setValue(sourceLeft.getValue() / sourceRight.getValue());
+		((FpRegister)destination).setValue(((FpRegister)sourceLeft).getValue() / ((FpRegister)sourceRight).getValue());
+		
 	}
 }
 
