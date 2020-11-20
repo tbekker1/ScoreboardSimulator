@@ -35,20 +35,33 @@ public class Simulator {
 	}
 
 	public void run() {
-		ArrayList<String>instructions = parseFile();
+		ArrayList<LineInfo>instructions = parseFile();
+		int clockCounter = 0;
+		while(true) {
+			clockCounter++;
+			getHardware().getIntegerFU().clockCycle();
+			getHardware().getFloatAddFU().clockCycle();
+			getHardware().getFloatMultiplierFU().clockCycle();
+			getHardware().getFloatDividerFU().clockCycle();
+			
+			
+			
+			
+		}
 		
 		
 	}
 	
-	public ArrayList<String> parseFile() {
-		ArrayList<String> instructions = new ArrayList<String>(); 
+	public ArrayList<LineInfo> parseFile() {
+		ArrayList<LineInfo> instructions = new ArrayList<LineInfo>(); 
 		File mips = new File(filename);
 		try {
 			FileReader fr = new FileReader(mips);
 			BufferedReader br = new BufferedReader(fr);
 			String line;
 			while((line=br.readLine())!=null) {
-				instructions.add(line);
+				LineInfo lInfo = new LineInfo(line);
+				instructions.add(lInfo);
 			}
 			br.close();
 			fr.close();

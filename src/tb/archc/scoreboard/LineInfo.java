@@ -75,8 +75,37 @@ public class LineInfo {
 	private StorageLocation destination = null;
 	private StorageLocation sourceLeft = null;
 	private StorageLocation sourceRight = null;
+	private int issueClockCycle;
+	private int readClockCycle;
+	private int executeClockCycle;
+	private int writeClockCycle;
 	private String line = "";
 	
+	
+	public int getIssueClockCycle() {
+		return issueClockCycle;
+	}
+	public void setIssueClockCycle(int issueClockCycle) {
+		this.issueClockCycle = issueClockCycle;
+	}
+	public int getReadClockCycle() {
+		return readClockCycle;
+	}
+	public void setReadClockCycle(int readClockCycle) {
+		this.readClockCycle = readClockCycle;
+	}
+	public int getExecuteClockCycle() {
+		return executeClockCycle;
+	}
+	public void setExecuteClockCycle(int executeClockCycle) {
+		this.executeClockCycle = executeClockCycle;
+	}
+	public int getWriteClockCycle() {
+		return writeClockCycle;
+	}
+	public void setWriteClockCycle(int writeClockCycle) {
+		this.writeClockCycle = writeClockCycle;
+	}
 	
 	public FunctionalUnit getFunctionalUnit() {
 		return functionalUnit;
