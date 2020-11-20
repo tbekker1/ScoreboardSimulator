@@ -132,6 +132,8 @@ public class LineInfo {
 				int immediate = Integer.parseInt(token);
 				IntRegister temp = new IntRegister("immediate");
 				temp.setValue(immediate);
+				temp.setReadOK(true);
+				temp.setWriteOK(false);
 				sl = temp;
 			}
 			break;

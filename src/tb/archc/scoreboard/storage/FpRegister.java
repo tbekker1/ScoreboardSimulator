@@ -5,6 +5,8 @@ public class FpRegister extends StorageLocation {
 	public FpRegister(String name) {
 		super(name);
 		this.value = 0;
+		this.setWriteOK(true);
+		this.setReadOK(false);
 	}
 	
 	private float value;

@@ -5,6 +5,8 @@ public class MemoryLocation extends StorageLocation{
 	public MemoryLocation(String name, int index) {
 		super(name);
 		this.index = index;
+		this.setWriteOK(true);
+		this.setReadOK(true);
 		this.memory = new Memory();
 	}
 	private int index;

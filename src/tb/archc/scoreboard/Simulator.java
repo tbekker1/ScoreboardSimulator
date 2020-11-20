@@ -46,7 +46,6 @@ public class Simulator {
 		try {
 			FileReader fr = new FileReader(mips);
 			BufferedReader br = new BufferedReader(fr);
-			//StringBuffer sb = new StringBuffer();
 			String line;
 			while((line=br.readLine())!=null) {
 				instructions.add(line);
