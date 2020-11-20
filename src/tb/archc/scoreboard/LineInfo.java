@@ -10,26 +10,72 @@ public class LineInfo {
 		this.line = line;
 		StringTokenizer st = new StringTokenizer(line);
 		if (st.hasMoreTokens()) {
-			String operation = st.nextToken();
-			parseOperation(operation);
-			if (st.hasMoreTokens()) {
-				String location1 = st.nextToken();
-				if (st.hasMoreTokens()) {
-					String location2 = st.nextToken();
-					if (st.hasMoreTokens()) {
-						String location3 = st.nextToken();
-					}
-				}
+			String token = st.nextToken();
+			if ("L.D".equals(token)){
+				this.operation = Operation.LOAD;
+				this.functionalUnit = Simulator.getHardware().getIntegerFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
 			}
+			else if ("S.D".equals(token)){
+				this.operation = Operation.STORE;
+				this.functionalUnit = Simulator.getHardware().getIntegerFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
+			}
+			else if ("ADD.D".equals(token)){
+				this.operation = Operation.ADD;
+				this.functionalUnit = Simulator.getHardware().getFloatAddFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
+				this.sourceRight = getStorageLocation(st.nextToken());
+			}
+			
+			else if ("ADD".equals(token.substring(0,3))){
+				this.operation = Operation.ADD;
+				this.functionalUnit = Simulator.getHardware().getIntegerFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
+				this.sourceRight = getStorageLocation(st.nextToken());
+			}
+			else if ("SUB.D".equals(token)){
+				this.operation = Operation.SUBTRACT;
+				this.functionalUnit = Simulator.getHardware().getFloatAddFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
+				this.sourceRight = getStorageLocation(st.nextToken());
+			}
+			else if ("SUB".equals(token)){
+				this.operation = Operation.SUBTRACT;
+				this.functionalUnit = Simulator.getHardware().getIntegerFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
+				this.sourceRight = getStorageLocation(st.nextToken());
+			}
+			else if ("MUL.D".equals(token)){
+				this.operation = Operation.MULTIPLY;
+				this.functionalUnit = Simulator.getHardware().getFloatMultiplierFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
+				this.sourceRight = getStorageLocation(st.nextToken());
+			}
+			else if ("DIV.D".equals(token)){
+				this.operation = Operation.DIVIDE;
+				this.functionalUnit = Simulator.getHardware().getFloatDividerFU();
+				this.destination = getStorageLocation(st.nextToken());
+				this.sourceLeft = getStorageLocation(st.nextToken());
+				this.sourceRight = getStorageLocation(st.nextToken());
+			}
+			
 	    }
 	}
 
-	private FunctionalUnit functionalUnit;
-	private Operation operation;
-	private StorageLocation destination;
-	private StorageLocation sourceLeft;
-	private StorageLocation sourceRight;
-	private String line;
+	private FunctionalUnit functionalUnit = null;
+	private Operation operation = null;
+	private StorageLocation destination = null;
+	private StorageLocation sourceLeft = null;
+	private StorageLocation sourceRight = null;
+	private String line = "";
 	
 	
 	public FunctionalUnit getFunctionalUnit() {
@@ -47,26 +93,59 @@ public class LineInfo {
 	public Operation getOperation() {
 		return operation;
 	}
-	
-	private void parseOperation(String token){
-		if ("L.D".equals(token.substring(3))){
-			this.operation = Operation.LOAD;
-			this.functionalUnit = Simulator.getHardware().getIntegerFU();
-		}
-		else if ("S.D".equals(token.substring(3))){
-			this.operation = Operation.STORE;
-			this.functionalUnit = Simulator.getHardware().getIntegerFU();
-		}
-		else if ("ADD".equals(token.substring(3))){
-			this.operation = Operation.ADD;
-			this.functionalUnit = Simulator.getHardware().getIntegerFU();
-		}
-		else if ("SUB".equals(token.substring(3))){
-			this.operation = Operation.SUBTRACT;
-			this.functionalUnit = Simulator.getHardware().getIntegerFU();
-		}
-		
+
+	public String getLine() {
+		return this.line;
 	}
 	
 	
+	private StorageLocation getStorageLocation(String token) {
+		StorageLocation sl = null;
+		String number;
+		switch (token.charAt(0)) {
+		case '$':
+			if (token.length() > 2 && Character.isDigit(token.charAt(2))) {
+				number = token.substring(1,3);
+			}
+			else {
+				number = token.substring(1,2);
+			}
+			sl = Simulator.getHardware().getIntRegisters(Integer.parseInt(number));
+			break;
+		case 'F':
+			if (token.length() > 2 && Character.isDigit(token.charAt(2))) {
+				number = token.substring(1,3);
+			}
+			else {
+				number = token.substring(1,2);
+			}
+			sl = Simulator.getHardware().getFpRegisters(Integer.parseInt(number));
+			break;
+		default:
+			int indexOfOffset = token.indexOf('(');
+			if (indexOfOffset >= 0) {
+				int offset = Integer.parseInt(token.substring(0, indexOfOffset));
+				int index = Integer.parseInt(token.substring(indexOfOffset + 1, token.indexOf(')')));
+				sl = Simulator.getHardware().getMemLocation(index + offset);
+			}
+			else {
+				int immediate = Integer.parseInt(token);
+				IntRegister temp = new IntRegister("immediate");
+				temp.setValue(immediate);
+				sl = temp;
+			}
+			break;
+		}
+		
+		return sl;
+		
+	}
+	
+	/*
+	public static void main(String [] args) {
+		String line = "ADDI $11, $23, 20";
+		LineInfo li = new LineInfo(line);
+		System.out.println(li.getLine());
+	}
+	*/
 }
