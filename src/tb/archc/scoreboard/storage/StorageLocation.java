@@ -9,7 +9,16 @@ public abstract class StorageLocation {
 	private String name;
 	private boolean readOK;
 	private boolean writeOK;
+	private boolean usedAsDestination;
 	
+	public boolean isUsedAsDestination() {
+		return usedAsDestination;
+	}
+
+	public void setUsedAsDestination(boolean usedAsDestination) {
+		this.usedAsDestination = usedAsDestination;
+	}
+
 	public String getName() {
 		return name;
 	}

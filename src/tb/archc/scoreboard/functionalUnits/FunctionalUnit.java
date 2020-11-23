@@ -6,13 +6,20 @@ import tb.archc.scoreboard.storage.StorageLocation;
 public abstract class FunctionalUnit {
 	protected int currClockCount;
 	protected int countToComplete;
-	private boolean busy;
+	private boolean busy = false;
+	private boolean executing = false;
 	private StorageLocation destination;
 	private StorageLocation sourceLeft;
 	private StorageLocation sourceRight;
 	
-    public abstract void execute(Operation operation, StorageLocation destination, StorageLocation sourceLeft, StorageLocation sourceRight);
+    public abstract void execute(Operation operation);
 	
+    public void issue(StorageLocation destination, StorageLocation sourceLeft, StorageLocation sourceRight) {
+    	setDestination(destination);
+		setSourceLeft(sourceLeft);
+		setSourceRight(sourceRight);
+    }
+    
 	public boolean isBusy() {
 		return busy;
 	}
@@ -24,7 +31,7 @@ public abstract class FunctionalUnit {
 	public void setDestination(StorageLocation destination) {
 		this.destination = destination;
 		this.destination.setReadOK(false);
-		this.destination.setWriteOK(false);
+		this.destination.setUsedAsDestination(true);
 	}
 
 	public StorageLocation getSourceLeft() {
@@ -56,17 +63,12 @@ public abstract class FunctionalUnit {
 	}
 
 	public void clockCycle() {
-		if (!operationFinished()) {
+		if (isExecuting()) {
 			this.currClockCount++;
 			if (operationFinished()) {
-				this.destination.setReadOK(true);
-				this.destination.setWriteOK(true);
-				if (this.sourceLeft != null) {
-					this.sourceLeft.setWriteOK(true);
-				}
-				if (this.sourceRight != null) {
-					this.sourceRight.setWriteOK(true);
-				}
+				this.executing = false;
+				//this.destination.setReadOK(true);
+				//this.destination.setWriteOK(true);
 			}
 		}
 	}
@@ -78,8 +80,11 @@ public abstract class FunctionalUnit {
 	
 	public void startOperation() {
 		this.currClockCount = 1;
-		setBusy(true);
+		this.executing = true;
 	}
 	
+	public boolean isExecuting(){
+		return this.executing;
+	}
 	
 }

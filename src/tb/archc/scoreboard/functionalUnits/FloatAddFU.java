@@ -3,7 +3,6 @@ package tb.archc.scoreboard.functionalUnits;
 import tb.archc.scoreboard.Operation;
 import tb.archc.scoreboard.storage.FpRegister;
 import tb.archc.scoreboard.storage.IntRegister;
-import tb.archc.scoreboard.storage.StorageLocation;
 
 public class FloatAddFU extends FunctionalUnit {
 
@@ -14,19 +13,15 @@ public class FloatAddFU extends FunctionalUnit {
 
 
 	@Override
-	public void execute(Operation operation, StorageLocation destination, StorageLocation sourceLeft,
-			StorageLocation sourceRight) {
+	public void execute(Operation operation) {
 		
-		this.setDestination(destination);
-		this.setSourceLeft(sourceLeft);
-		this.setSourceRight(sourceRight);
 		this.startOperation();
 		switch (operation) {
 		case ADD:
-			((FpRegister)destination).setValue(((FpRegister)sourceLeft).getValue() + ((FpRegister)sourceRight).getValue());
+			((FpRegister)getDestination()).setValue(((FpRegister)getSourceLeft()).getValue() + ((FpRegister)getSourceRight()).getValue());
 			break;
 		case SUBTRACT:
-			((FpRegister)destination).setValue(((FpRegister)sourceLeft).getValue() - ((FpRegister)sourceRight).getValue());
+			((FpRegister)getDestination()).setValue(((FpRegister)getSourceLeft()).getValue() - ((FpRegister)getSourceRight()).getValue());
 			break;
 		default:
 			break;

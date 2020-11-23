@@ -13,25 +13,21 @@ public class IntegerFU extends FunctionalUnit {
 	}
 
 	@Override
-	public void execute(Operation operation, StorageLocation destination, StorageLocation sourceLeft,
-			StorageLocation sourceRight) {
+	public void execute(Operation operation) {
 		
-		this.setDestination(destination);
-		this.setSourceLeft(sourceLeft);
-		this.setSourceRight(sourceRight);
 		this.startOperation();
 		switch (operation) {
 		case LOAD:
-			((FpRegister)destination).setValue(((MemoryLocation)sourceLeft).read());
+			((FpRegister)getDestination()).setValue(((MemoryLocation)getSourceLeft()).read());
 			break;
 		case STORE:
-			((MemoryLocation)destination).write(((FpRegister)sourceLeft).getValue());
+			((MemoryLocation)getDestination()).write(((FpRegister)getSourceLeft()).getValue());
 			break;
 		case ADD:
-			((IntRegister)destination).setValue(((IntRegister)sourceLeft).getValue() + ((IntRegister)sourceRight).getValue());
+			((IntRegister)getDestination()).setValue(((IntRegister)getSourceLeft()).getValue() + ((IntRegister)getSourceRight()).getValue());
 			break;
 		case SUBTRACT:
-			((IntRegister)destination).setValue(((IntRegister)sourceLeft).getValue() - ((IntRegister)sourceRight).getValue());
+			((IntRegister)getDestination()).setValue(((IntRegister)getSourceLeft()).getValue() - ((IntRegister)getSourceRight()).getValue());
 			break;
 		default:
 			break;

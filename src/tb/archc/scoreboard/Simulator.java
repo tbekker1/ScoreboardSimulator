@@ -43,6 +43,57 @@ public class Simulator {
 			getHardware().getFloatAddFU().clockCycle();
 			getHardware().getFloatMultiplierFU().clockCycle();
 			getHardware().getFloatDividerFU().clockCycle();
+			for (int i = 0; i < instructions.size(); i++) {
+				LineInfo instruction = instructions.get(i);
+				switch (instruction.getState()) {
+				case QUEUED:
+					if (canIssue(instruction)) {
+						instruction.setState(InstructionState.ISSUED);
+						instruction.issue();
+						instruction.setIssueClockCycle(clockCounter);
+					}
+					break;
+				
+				case ISSUED:
+					if (canRead(instruction)) {
+						instruction.setState(InstructionState.READ);
+						instruction.setReadClockCycle(clockCounter);
+					}
+					break;
+					
+				case READ:
+					instruction.setState(InstructionState.EXECUTING);
+					instruction.getSourceLeft().setWriteOK(true);
+					if (instruction.getSourceRight() != null) {
+						instruction.getSourceRight().setWriteOK(true);
+					}
+					instruction.execute();
+					break;
+				
+				case EXECUTING:
+					if (!instruction.getFunctionalUnit().isExecuting()) {
+						instruction.setState(InstructionState.EXECUTED);
+						instruction.setExecuteClockCycle(clockCounter);
+					}
+					break;
+					
+				case EXECUTED:
+					if (canWrite(instruction)) {
+						instruction.setState(InstructionState.FINISHED);
+						instruction.setWriteClockCycle(clockCounter);
+						instruction.getFunctionalUnit().setBusy(false);
+						instruction.getDestination().setReadOK(true);
+						instruction.getDestination().setWriteOK(true);
+						instruction.getDestination().setUsedAsDestination(false);
+					}
+					break;
+					
+				default:
+					break;
+				
+				}
+				
+			}
 			
 			
 			
@@ -73,5 +124,54 @@ public class Simulator {
 		return instructions;
 	}
 	
+	
+	/**
+	 * check for structural hazard: is FU busy?
+	 * check for WAW: do not issue if an 
+	 *  active instruction has the same destination register
+	 * @param instruction
+	 * @return
+	 */
+	public boolean canIssue(LineInfo instruction) {
+		boolean returnVal = true;
+		if (instruction.getFunctionalUnit().isBusy()) {
+			returnVal = false;
+		}
+		else if (instruction.getDestination().isUsedAsDestination()) {
+			returnVal = false;
+		}
+		return returnVal;
+	}
+	
+	/**
+	 * Check for RAW: do not issue is
+	 * any source register will be
+	 * written by an active instruction
+	 * @param instruction
+	 * @return
+	 */
+	public boolean canRead(LineInfo instruction) {
+		boolean returnVal = true;
+		if (!instruction.getSourceLeft().isReadOK()) {
+			returnVal = false;
+		}
+		else if (instruction.getSourceRight() != null && !instruction.getSourceRight().isReadOK()) {
+			returnVal = false;
+		}
+		return returnVal;
+	}
+	
+	/**
+	 * Check for WAR: do not write if read flag is busy
+	 * @param instruction
+	 * @return
+	 */
+	public boolean canWrite(LineInfo instruction) {
+		boolean returnVal = true;
+		if (!instruction.getDestination().isWriteOK()) {
+			returnVal = false;
+		}
+		return returnVal;
+	}
 	
 }

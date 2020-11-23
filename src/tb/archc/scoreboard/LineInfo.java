@@ -69,18 +69,33 @@ public class LineInfo {
 			
 	    }
 	}
-
+	
 	private FunctionalUnit functionalUnit = null;
 	private Operation operation = null;
 	private StorageLocation destination = null;
 	private StorageLocation sourceLeft = null;
 	private StorageLocation sourceRight = null;
-	private int issueClockCycle;
-	private int readClockCycle;
-	private int executeClockCycle;
-	private int writeClockCycle;
+	private int issueClockCycle = 0;
+	private int readClockCycle = 0;
+	private int executeClockCycle = 0;
+	private int writeClockCycle = 0;
 	private String line = "";
+	private InstructionState state = InstructionState.QUEUED;
 	
+	public void issue() {
+		getFunctionalUnit().issue(getDestination(), getSourceLeft(), getSourceRight());
+	}
+	
+	public void execute() {
+		getFunctionalUnit().execute(getOperation());
+	}
+	
+	public InstructionState getState() {
+		return state;
+	}
+	public void setState(InstructionState state) {
+		this.state = state;
+	}
 	
 	public int getIssueClockCycle() {
 		return issueClockCycle;
@@ -88,12 +103,14 @@ public class LineInfo {
 	public void setIssueClockCycle(int issueClockCycle) {
 		this.issueClockCycle = issueClockCycle;
 	}
+	
 	public int getReadClockCycle() {
 		return readClockCycle;
 	}
 	public void setReadClockCycle(int readClockCycle) {
 		this.readClockCycle = readClockCycle;
 	}
+	
 	public int getExecuteClockCycle() {
 		return executeClockCycle;
 	}
@@ -170,6 +187,13 @@ public class LineInfo {
 		
 		return sl;
 		
+	}
+	
+	public boolean isLineFinished() {
+		if (getWriteClockCycle() != 0) {
+			return true;
+		}
+		return false;
 	}
 	
 	/*
