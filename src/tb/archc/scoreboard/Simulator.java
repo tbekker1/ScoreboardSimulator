@@ -37,25 +37,33 @@ public class Simulator {
 	public void run() {
 		ArrayList<LineInfo>instructions = parseFile();
 		int clockCounter = 0;
-		while(true) {
+		int numFinishedInstructions = 0;
+		while(numFinishedInstructions < instructions.size()) {
 			clockCounter++;
-			getHardware().getIntegerFU().clockCycle();
-			getHardware().getFloatAddFU().clockCycle();
-			getHardware().getFloatMultiplierFU().clockCycle();
-			getHardware().getFloatDividerFU().clockCycle();
-			for (int i = 0; i < instructions.size(); i++) {
+			//System.out.println("Clock counter " + clockCounter + "i finished " + numFinishedInstructions);
+			numFinishedInstructions = 0;
+			boolean issuedThisCycle = false;
+			boolean stopCycle = false;
+			for (int i = 0; stopCycle == false && i < instructions.size(); i++) {
 				LineInfo instruction = instructions.get(i);
 				switch (instruction.getState()) {
 				case QUEUED:
-					if (canIssue(instruction)) {
+					if (!issuedThisCycle && canIssue(instruction)) {
 						instruction.setState(InstructionState.ISSUED);
 						instruction.issue();
 						instruction.setIssueClockCycle(clockCounter);
+						issuedThisCycle = true;
+						
 					}
+					stopCycle = true;
 					break;
 				
 				case ISSUED:
 					if (canRead(instruction)) {
+						instruction.getSourceLeft().setWriteOK(false);
+						if (instruction.getSourceRight() != null) {
+							instruction.getSourceRight().setWriteOK(false);
+						}
 						instruction.setState(InstructionState.READ);
 						instruction.setReadClockCycle(clockCounter);
 					}
@@ -68,7 +76,10 @@ public class Simulator {
 						instruction.getSourceRight().setWriteOK(true);
 					}
 					instruction.execute();
-					break;
+					if (instruction.getFunctionalUnit().isExecuting()) {
+						break;
+					}
+				
 				
 				case EXECUTING:
 					if (!instruction.getFunctionalUnit().isExecuting()) {
@@ -85,25 +96,51 @@ public class Simulator {
 						instruction.getDestination().setReadOK(true);
 						instruction.getDestination().setWriteOK(true);
 						instruction.getDestination().setUsedAsDestination(false);
+						stopCycle = true;
+						//output(instructions);
 					}
 					break;
 					
-				default:
+				case FINISHED:
+					numFinishedInstructions++;
 					break;
-				
 				}
 				
 			}
 			
-			
-			
+			getHardware().getIntegerFU().clockCycle();
+			getHardware().getFloatAddFU().clockCycle();
+			getHardware().getFloatMultiplierFU().clockCycle();
+			getHardware().getFloatDividerFU().clockCycle();	
 			
 		}
+		
+		output(instructions);
+	}
+	
+	private void output(ArrayList<LineInfo> instructions) {
+		for (int i = 0; i < instructions.size(); i++) {
+			printLineInfo(instructions.get(i));
+		}
+		
 		
 		
 	}
 	
-	public ArrayList<LineInfo> parseFile() {
+	private void printLineInfo(LineInfo line) {
+		System.out.println(String.format("%-20s %5s %5s %10s %5d %5d %5d %5d",  
+				line.getLine(),
+				line.getDestination().getName(),
+				line.getSourceLeft().getName(),
+				line.getSourceRight()==null?"-" : line.getSourceRight().getName(),
+				line.getIssueClockCycle(),
+				line.getReadClockCycle(),
+				line.getExecuteClockCycle(),
+				line.getWriteClockCycle()));
+						
+	}
+	
+	private ArrayList<LineInfo> parseFile() {
 		ArrayList<LineInfo> instructions = new ArrayList<LineInfo>(); 
 		File mips = new File(filename);
 		try {
@@ -152,7 +189,7 @@ public class Simulator {
 	 */
 	public boolean canRead(LineInfo instruction) {
 		boolean returnVal = true;
-		if (!instruction.getSourceLeft().isReadOK()) {
+		if (!instruction.getSourceLeft().isReadOK() && instruction.getSourceLeft() != instruction.getDestination() && instruction.getSourceRight() != instruction.getDestination()) {
 			returnVal = false;
 		}
 		else if (instruction.getSourceRight() != null && !instruction.getSourceRight().isReadOK()) {

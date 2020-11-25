@@ -6,7 +6,7 @@ public class IntRegister extends StorageLocation {
 		super(name);
 		this.value = 0;
 		this.setWriteOK(true);
-		this.setReadOK(false);
+		this.setReadOK(true);
 	}
 	
 	private int value;

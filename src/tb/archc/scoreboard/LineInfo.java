@@ -20,8 +20,8 @@ public class LineInfo {
 			else if ("S.D".equals(token)){
 				this.operation = Operation.STORE;
 				this.functionalUnit = Simulator.getHardware().getIntegerFU();
-				this.destination = getStorageLocation(st.nextToken());
 				this.sourceLeft = getStorageLocation(st.nextToken());
+				this.destination = getStorageLocation(st.nextToken());
 			}
 			else if ("ADD.D".equals(token)){
 				this.operation = Operation.ADD;
