@@ -79,6 +79,12 @@ public class Simulator {
 							
 						instruction.setState(InstructionState.READ);
 						instruction.setReadClockCycle(clockCounter);
+						
+						
+						instruction.getSourceLeft().requestWriteLock(false);
+						if (instruction.getSourceRight() != null) {
+							instruction.getSourceRight().requestWriteLock(false);
+						}
 					}
 					else {
 						if (instruction.getSourceLeft().isReadOK() == true &&
@@ -103,10 +109,12 @@ public class Simulator {
 					//stateManager.setWriteTrueState(instruction.getSourceLeft());
 					//stateManager.setWriteTrueState(instruction.getSourceRight());
 					
+					/*
 					instruction.getSourceLeft().requestWriteLock(false);
 					if (instruction.getSourceRight() != null) {
 						instruction.getSourceRight().requestWriteLock(false);
 					}
+					*/
 					
 					instruction.execute();
 					if (instruction.getFunctionalUnit().isExecuting()) {
