@@ -176,7 +176,7 @@ public class LineInfo {
 			}
 			else {
 				int immediate = Integer.parseInt(token);
-				IntRegister temp = new IntRegister("immediate");
+				IntRegister temp = new IntRegister(token);
 				temp.setValue(immediate);
 				temp.setReadOK(true);
 				temp.setWriteOK(false);
@@ -187,13 +187,6 @@ public class LineInfo {
 		
 		return sl;
 		
-	}
-	
-	public boolean isLineFinished() {
-		if (getWriteClockCycle() != 0) {
-			return true;
-		}
-		return false;
 	}
 	
 }

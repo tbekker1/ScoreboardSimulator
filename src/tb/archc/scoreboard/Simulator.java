@@ -38,7 +38,6 @@ public class Simulator {
 		while(numFinishedInstructions < instructions.size()) {
 			clockCounter++;
 			StateManager stateManager = new StateManager(); 
-			//System.out.println("Clock counter " + clockCounter + "i finished " + numFinishedInstructions);
 			numFinishedInstructions = 0;
 			boolean issuedThisCycle = false;
 			boolean stopCycle = false;
@@ -51,13 +50,10 @@ public class Simulator {
 						instruction.issue();
 						instruction.setIssueClockCycle(clockCounter);
 						if (instruction.getDestination().isWriteOK()) {
-							//stateManager.setReadFalseState(instruction.getDestination());
 							instruction.getDestination().requestReadLock(true);
 						}
 						stateManager.setBusyTrue(instruction.getFunctionalUnit());
 						stateManager.setUsedAsDestTrue(instruction.getDestination());
-						//stateManager.setWriteFalseState(instruction.getSourceLeft());
-						//stateManager.setWriteFalseState(instruction.getSourceRight());
 						issuedThisCycle = true;
 						
 					}
@@ -66,8 +62,6 @@ public class Simulator {
 				
 				case ISSUED:
 					if (canRead(instruction)) {
-						//stateManager.setWriteFalseState(instruction.getSourceLeft());
-						//stateManager.setWriteFalseState(instruction.getSourceRight());
 						if (instruction.getSourceLeft() != instruction.getDestination()) {
 							instruction.getSourceLeft().requestWriteLock(true);
 						}
@@ -90,7 +84,6 @@ public class Simulator {
 						if (instruction.getSourceLeft().isReadOK() == true &&
 								instruction.getSourceLeft().isWriteOK() == true &&
 								instruction.getSourceLeft() != instruction.getDestination()) {
-							//stateManager.setWriteFalseState(instruction.getSourceLeft());
 							instruction.getSourceLeft().requestWriteLock(true);
 						}
 						
@@ -98,7 +91,6 @@ public class Simulator {
 								instruction.getSourceRight().isReadOK() == true &&
 								instruction.getSourceRight().isWriteOK() == true &&
 								instruction.getDestination()!= instruction.getSourceRight()) {
-							//stateManager.setWriteFalseState(instruction.getSourceRight());
 							instruction.getSourceRight().requestWriteLock(true);
 						}
 					}
@@ -106,15 +98,6 @@ public class Simulator {
 					
 				case READ:
 					instruction.setState(InstructionState.EXECUTING);
-					//stateManager.setWriteTrueState(instruction.getSourceLeft());
-					//stateManager.setWriteTrueState(instruction.getSourceRight());
-					
-					/*
-					instruction.getSourceLeft().requestWriteLock(false);
-					if (instruction.getSourceRight() != null) {
-						instruction.getSourceRight().requestWriteLock(false);
-					}
-					*/
 					
 					instruction.execute();
 					if (instruction.getFunctionalUnit().isExecuting()) {
@@ -125,7 +108,6 @@ public class Simulator {
 				case EXECUTING:
 					if (!instruction.getFunctionalUnit().isExecuting()) {
 						if (instruction.getDestination().isReadOK() && instruction.getDestination().isWriteOK()) {
-							//stateManager.setReadFalseState(instruction.getDestination());
 							instruction.getDestination().requestReadLock(true);
 						}
 						
@@ -139,8 +121,6 @@ public class Simulator {
 						instruction.setState(InstructionState.FINISHED);
 						instruction.setWriteClockCycle(clockCounter);
 				
-						//stateManager.setReadTrueState(instruction.getDestination());
-						//stateManager.setWriteTrueState(instruction.getDestination());
 						instruction.getDestination().requestReadLock(false);
 						instruction.getDestination().requestWriteLock(false);
 						
@@ -163,25 +143,70 @@ public class Simulator {
 			getHardware().getFloatDividerFU().clockCycle();	
 			
 			stateManager.clockCycle();
-			
-			
-			output(instructions);
 		}
 		
 		output(instructions);
 	}
 	
 	private void output(ArrayList<LineInfo> instructions) {
+		System.out.println(String.format("%-20s %5s %5s %5s %10s %5s %5s %5s",  
+				"Instruction",
+				"dest",
+				"src1",
+				"src2",
+				"Issue",
+				"Read",
+				"Exec",
+				"Write"));
+		
+		System.out.println("-------------------------------------------------------------------");
+		
 		for (int i = 0; i < instructions.size(); i++) {
 			printLineInfo(instructions.get(i));
 		}
 		
+		System.out.println();
+		System.out.println("Floating Point Registers");
+		FpRegister [] fpRegisters = Simulator.getHardware().getAllFpRegisters();
+		for (int i = 0; i < fpRegisters.length; i++) {
+			System.out.print(String.format("%8s ", fpRegisters[i].getName()));
+		}
+		System.out.println();
+		for (int i = 0; i < fpRegisters.length; i++) {
+			System.out.print(String.format("%8.2f ", fpRegisters[i].getValue()));
+		}
+		System.out.println();
 		
+		
+		System.out.println();
+		System.out.println("Integer Registers");
+		IntRegister [] intRegisters = Simulator.getHardware().getAllIntRegisters();
+		for (int i = 0; i < intRegisters.length; i++) {
+			System.out.print(String.format("%8s ", intRegisters[i].getName()));
+		}
+		System.out.println();
+		for (int i = 0; i < intRegisters.length; i++) {
+			System.out.print(String.format("%8d ", intRegisters[i].getValue()));
+		}
+		System.out.println();
+		
+		
+		System.out.println();
+		System.out.println("Memory");
+		MemoryLocation [] memoryLocations = Simulator.getHardware().getAllMemoryLocations();
+		for (int i = 0; i < memoryLocations.length; i++) {
+			System.out.print(String.format("%8s ", memoryLocations[i].getName()));
+		}
+		System.out.println();
+		for (int i = 0; i < memoryLocations.length; i++) {
+			System.out.print(String.format("%8.2f ", memoryLocations[i].read()));
+		}
+		System.out.println();
 		
 	}
 	
 	private void printLineInfo(LineInfo line) {
-		System.out.println(String.format("%-20s %5s %5s %10s %5d %5d %5d %5d",  
+		System.out.println(String.format("%-20s %5s %5s %5s %10d %5d %5d %5d",  
 				line.getLine(),
 				line.getDestination().getName(),
 				line.getSourceLeft().getName(),

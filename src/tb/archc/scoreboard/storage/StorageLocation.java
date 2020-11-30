@@ -25,14 +25,12 @@ public abstract class StorageLocation {
 	}
 	
 	public void requestWriteLock (boolean val) {
-		//if (val == false || this.requestedReadLock != 1) {
 			if (val == true) {
 				this.requestedWriteLock = 1;
 			}
 			else {
 				this.requestedWriteLock = 0;
 			}
-		//}
 	}
 	
 	public void executeLocks() {
@@ -65,21 +63,9 @@ public abstract class StorageLocation {
 		this.readOK = readOK;
 	}
 	public boolean isWriteOK() {
-		//return writeOK == 0;
 		return writeOK;
 	}
 	public void setWriteOK(boolean writeOK) {
-		/*
-		if (writeOK == false) {
-			this.writeOK++;
-		}
-		else {
-			this.writeOK--;
-			if (this.writeOK < 0) {
-				this.writeOK = 0;
-			}
-		}
-		*/
 		this.writeOK = writeOK;
 	}
 	

@@ -10,11 +10,7 @@ import tb.archc.scoreboard.storage.StorageLocation;
 
 public class StateManager {
 
-	private ArrayList<StorageLocation> setReadFalse = new ArrayList<StorageLocation>();
-	private ArrayList<StorageLocation> setReadTrue = new ArrayList<StorageLocation>();
-	private ArrayList<StorageLocation> setWriteFalse = new ArrayList<StorageLocation>();
-	private ArrayList<StorageLocation> setWriteTrue = new ArrayList<StorageLocation>();
-	
+
 	private ArrayList<FunctionalUnit> setBusyTrue = new ArrayList<FunctionalUnit>();
 	private ArrayList<FunctionalUnit> setBusyFalse = new ArrayList<FunctionalUnit>();
 	
@@ -31,23 +27,6 @@ public class StateManager {
 			this.setUsedAsDestTrue.add(sl);
 	}
 	
-	public void setReadFalseState(StorageLocation sl) {
-		if (sl != null) 
-			this.setReadFalse.add(sl);
-	}
-	public void setReadTrueState(StorageLocation sl) {
-		if (sl != null) 
-			this.setReadTrue.add(sl);
-	}
-	public void setWriteFalseState(StorageLocation sl) {
-		if (sl != null) 
-			this.setWriteFalse.add(sl);
-	}
-	public void setWriteTrueState(StorageLocation sl) {
-		if (sl != null) 
-			this.setWriteTrue.add(sl);
-	}
-	
 	
 	public void setBusyTrue(FunctionalUnit fu) { 
 		this.setBusyTrue.add(fu);
@@ -57,24 +36,7 @@ public class StateManager {
 	}
 	
 	public void clockCycle() {
-		/*
-		for (int i = this.setReadFalse.size(); i > 0; i--) {
-			this.setReadFalse.remove(i-1).setReadOK(false);		
-		}
-		
-		for (int i = this.setReadTrue.size(); i > 0; i--) {
-			this.setReadTrue.remove(i-1).setReadOK(true);		
-		}
-		
-		for (int i = this.setWriteFalse.size(); i > 0; i--) {
-			this.setWriteFalse.remove(i-1).setWriteOK(false);		
-		}
-		
-		for (int i = this.setWriteTrue.size(); i > 0; i--) {
-			this.setWriteTrue.remove(i-1).setWriteOK(true);		
-		}
-		*/
-		
+
 		for (int i = this.setBusyTrue.size(); i > 0; i--) {
 			this.setBusyTrue.remove(i-1).setBusy(true);		
 		}
