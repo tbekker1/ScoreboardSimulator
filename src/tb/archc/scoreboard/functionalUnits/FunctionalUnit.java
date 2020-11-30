@@ -18,7 +18,6 @@ public abstract class FunctionalUnit {
     	setDestination(destination);
 		setSourceLeft(sourceLeft);
 		setSourceRight(sourceRight);
-		setBusy(true);
     }
     
 	public boolean isBusy() {
@@ -31,8 +30,6 @@ public abstract class FunctionalUnit {
 
 	public void setDestination(StorageLocation destination) {
 		this.destination = destination;
-		this.destination.setReadOK(false);
-		this.destination.setUsedAsDestination(true);
 	}
 
 	public StorageLocation getSourceLeft() {
@@ -41,10 +38,6 @@ public abstract class FunctionalUnit {
 
 	public void setSourceLeft(StorageLocation sourceLeft) {
 		this.sourceLeft = sourceLeft;
-		//if (this.sourceLeft != null) {
-			//this.sourceLeft.setReadOK(true);
-			//this.sourceLeft.setWriteOK(false);
-		//}
 	}
 
 	public StorageLocation getSourceRight() {
@@ -53,10 +46,6 @@ public abstract class FunctionalUnit {
 
 	public void setSourceRight(StorageLocation sourceRight) {
 		this.sourceRight = sourceRight;
-		//if (this.sourceRight != null) {
-			//this.sourceRight.setReadOK(true);
-			//this.sourceRight.setWriteOK(false);
-		//}
 	}
 
 	public void setBusy(boolean busy) {

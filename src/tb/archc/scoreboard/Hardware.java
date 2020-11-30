@@ -25,6 +25,18 @@ public class Hardware {
 	private FloatMultiplierFU floatMultiplierFU = new FloatMultiplierFU();
 	private FloatDividerFU floatDividerFU = new FloatDividerFU();
 	
+	public FpRegister[] getAllFpRegisters() {
+		return fpRegisters;
+	}
+	
+	public IntRegister[] getAllIntRegisters() {
+		return intRegisters;
+	}
+	
+	public MemoryLocation[] getAllMemoryLocations() {
+		return memLocation;
+	}
+	
 	public FpRegister getFpRegisters(int index) {
 		if (index >= 0 && index < 32) {
 			return fpRegisters[index];

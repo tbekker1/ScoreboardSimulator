@@ -196,11 +196,4 @@ public class LineInfo {
 		return false;
 	}
 	
-	/*
-	public static void main(String [] args) {
-		String line = "ADDI $11, $23, 20";
-		LineInfo li = new LineInfo(line);
-		System.out.println(li.getLine());
-	}
-	*/
 }

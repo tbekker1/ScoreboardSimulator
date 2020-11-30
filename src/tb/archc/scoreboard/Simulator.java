@@ -6,10 +6,6 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class Simulator {
-
-	public Simulator() {
-		
-	}
 	
 	public static Hardware getHardware() {
 		if (hardware == null) {
@@ -36,10 +32,12 @@ public class Simulator {
 
 	public void run() {
 		ArrayList<LineInfo>instructions = parseFile();
+		
 		int clockCounter = 0;
 		int numFinishedInstructions = 0;
 		while(numFinishedInstructions < instructions.size()) {
 			clockCounter++;
+			StateManager stateManager = new StateManager(); 
 			//System.out.println("Clock counter " + clockCounter + "i finished " + numFinishedInstructions);
 			numFinishedInstructions = 0;
 			boolean issuedThisCycle = false;
@@ -52,29 +50,64 @@ public class Simulator {
 						instruction.setState(InstructionState.ISSUED);
 						instruction.issue();
 						instruction.setIssueClockCycle(clockCounter);
+						if (instruction.getDestination().isWriteOK()) {
+							//stateManager.setReadFalseState(instruction.getDestination());
+							instruction.getDestination().requestReadLock(true);
+						}
+						stateManager.setBusyTrue(instruction.getFunctionalUnit());
+						stateManager.setUsedAsDestTrue(instruction.getDestination());
+						//stateManager.setWriteFalseState(instruction.getSourceLeft());
+						//stateManager.setWriteFalseState(instruction.getSourceRight());
 						issuedThisCycle = true;
 						
 					}
-					stopCycle = true;
+					issuedThisCycle = true;
 					break;
 				
 				case ISSUED:
 					if (canRead(instruction)) {
-						instruction.getSourceLeft().setWriteOK(false);
-						if (instruction.getSourceRight() != null) {
-							instruction.getSourceRight().setWriteOK(false);
+						//stateManager.setWriteFalseState(instruction.getSourceLeft());
+						//stateManager.setWriteFalseState(instruction.getSourceRight());
+						if (instruction.getSourceLeft() != instruction.getDestination()) {
+							instruction.getSourceLeft().requestWriteLock(true);
 						}
+						
+						if (instruction.getSourceRight() != null &&
+								instruction.getDestination()!= instruction.getSourceRight()){
+							instruction.getSourceRight().requestWriteLock(true);
+						}
+							
 						instruction.setState(InstructionState.READ);
 						instruction.setReadClockCycle(clockCounter);
+					}
+					else {
+						if (instruction.getSourceLeft().isReadOK() == true &&
+								instruction.getSourceLeft().isWriteOK() == true &&
+								instruction.getSourceLeft() != instruction.getDestination()) {
+							//stateManager.setWriteFalseState(instruction.getSourceLeft());
+							instruction.getSourceLeft().requestWriteLock(true);
+						}
+						
+						if (instruction.getSourceRight() != null &&
+								instruction.getSourceRight().isReadOK() == true &&
+								instruction.getSourceRight().isWriteOK() == true &&
+								instruction.getDestination()!= instruction.getSourceRight()) {
+							//stateManager.setWriteFalseState(instruction.getSourceRight());
+							instruction.getSourceRight().requestWriteLock(true);
+						}
 					}
 					break;
 					
 				case READ:
 					instruction.setState(InstructionState.EXECUTING);
-					instruction.getSourceLeft().setWriteOK(true);
+					//stateManager.setWriteTrueState(instruction.getSourceLeft());
+					//stateManager.setWriteTrueState(instruction.getSourceRight());
+					
+					instruction.getSourceLeft().requestWriteLock(false);
 					if (instruction.getSourceRight() != null) {
-						instruction.getSourceRight().setWriteOK(true);
+						instruction.getSourceRight().requestWriteLock(false);
 					}
+					
 					instruction.execute();
 					if (instruction.getFunctionalUnit().isExecuting()) {
 						break;
@@ -83,21 +116,28 @@ public class Simulator {
 				
 				case EXECUTING:
 					if (!instruction.getFunctionalUnit().isExecuting()) {
+						if (instruction.getDestination().isReadOK() && instruction.getDestination().isWriteOK()) {
+							//stateManager.setReadFalseState(instruction.getDestination());
+							instruction.getDestination().requestReadLock(true);
+						}
+						
 						instruction.setState(InstructionState.EXECUTED);
 						instruction.setExecuteClockCycle(clockCounter);
 					}
 					break;
 					
 				case EXECUTED:
-					if (canWrite(instruction)) {
+    					if (canWrite(instruction)) {
 						instruction.setState(InstructionState.FINISHED);
 						instruction.setWriteClockCycle(clockCounter);
-						instruction.getFunctionalUnit().setBusy(false);
-						instruction.getDestination().setReadOK(true);
-						instruction.getDestination().setWriteOK(true);
-						instruction.getDestination().setUsedAsDestination(false);
-						stopCycle = true;
-						//output(instructions);
+				
+						//stateManager.setReadTrueState(instruction.getDestination());
+						//stateManager.setWriteTrueState(instruction.getDestination());
+						instruction.getDestination().requestReadLock(false);
+						instruction.getDestination().requestWriteLock(false);
+						
+						stateManager.setBusyFalse(instruction.getFunctionalUnit());
+						stateManager.setUsedAsDestFalse(instruction.getDestination());
 					}
 					break;
 					
@@ -106,6 +146,7 @@ public class Simulator {
 					break;
 				}
 				
+				
 			}
 			
 			getHardware().getIntegerFU().clockCycle();
@@ -113,6 +154,10 @@ public class Simulator {
 			getHardware().getFloatMultiplierFU().clockCycle();
 			getHardware().getFloatDividerFU().clockCycle();	
 			
+			stateManager.clockCycle();
+			
+			
+			output(instructions);
 		}
 		
 		output(instructions);
@@ -189,10 +234,13 @@ public class Simulator {
 	 */
 	public boolean canRead(LineInfo instruction) {
 		boolean returnVal = true;
-		if (!instruction.getSourceLeft().isReadOK() && instruction.getSourceLeft() != instruction.getDestination() && instruction.getSourceRight() != instruction.getDestination()) {
+		if (!instruction.getSourceLeft().isReadOK() && 
+				instruction.getSourceLeft() != instruction.getDestination()) {
 			returnVal = false;
 		}
-		else if (instruction.getSourceRight() != null && !instruction.getSourceRight().isReadOK()) {
+		else if (instruction.getSourceRight() != null && 
+				!instruction.getSourceRight().isReadOK() &&
+				instruction.getSourceRight() != instruction.getDestination()) {
 			returnVal = false;
 		}
 		return returnVal;
