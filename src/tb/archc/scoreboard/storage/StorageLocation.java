@@ -1,6 +1,22 @@
 package tb.archc.scoreboard.storage;
 
+
+/**
+ * Class StorageLocation:
+ * The base class for all of the Storage Locations (Registers/Memory Locations).
+ * 
+ * Includes the name of the storage location, the flag booleans for whether it is 
+ * ok to read or write on that location. It also has a requestedReadLock int for if those read or write
+ * booleans should be changed on the next cycle.
+ * 
+ */
 public abstract class StorageLocation {
+	
+	/**
+	 * StorageLocation()
+	 * 
+	 * The constructor for the class. Takes in a name, and assigns the name of that storage location
+	 */
 	public StorageLocation(String name) {
 		super();
 		this.name = name;
@@ -13,6 +29,13 @@ public abstract class StorageLocation {
 	private int requestedWriteLock = -1;
 	private boolean usedAsDestination;
 	
+	
+	/**
+	 * requestReadLock()
+	 * 
+	 * takes in a request for a read lock, and makes sure that there is no requested write lock
+	 * for the next clock cycle.
+	 */
 	public void requestReadLock(boolean val) {
 		if (val == false || this.requestedWriteLock != 1) {
 			if (val == true) {
@@ -24,6 +47,12 @@ public abstract class StorageLocation {
 		}
 	}
 	
+	/**
+	 * requestWriteLock()
+	 * 
+	 * takes in a request for a write lock, and sets the variable to set the lock on the next
+	 * clock cycle.
+	 */
 	public void requestWriteLock (boolean val) {
 			if (val == true) {
 				this.requestedWriteLock = 1;
@@ -33,6 +62,15 @@ public abstract class StorageLocation {
 			}
 	}
 	
+	
+	/**
+	 * executeLocks()
+	 * 
+	 * Based on what the requested locks value is, it sets the actual read lock or write lock to 
+	 * that value on the next clock cycle.
+	 * 
+	 * It then resets the values of the requested read and write locks.
+	 */
 	public void executeLocks() {
 		if (this.requestedReadLock >= 0) {
 			setReadOK(this.requestedReadLock == 0);
@@ -44,6 +82,7 @@ public abstract class StorageLocation {
 		this.requestedWriteLock = -1;
 	}
 	
+	//All the functions below this point are setters and getters for the storage location variables.
 	public boolean isUsedAsDestination() {
 		return usedAsDestination;
 	}

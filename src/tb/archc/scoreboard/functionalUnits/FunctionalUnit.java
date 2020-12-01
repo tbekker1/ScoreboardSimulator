@@ -3,6 +3,14 @@ package tb.archc.scoreboard.functionalUnits;
 import tb.archc.scoreboard.Operation;
 import tb.archc.scoreboard.storage.StorageLocation;
 
+/**
+ * Class FunctionalUnit:
+ * The base class for all of the functional units. Contains the destination and sources StorageLocations
+ * Contains a bool for whether the FU is busy, and a bool for if it is executing.
+ * 
+ * Also contains the current Clock cycle while executing, and the number of clock cycles
+ * it takes to finish executing that specific functional unit.
+ */
 public abstract class FunctionalUnit {
 	protected int currClockCount;
 	protected int countToComplete;
@@ -12,14 +20,24 @@ public abstract class FunctionalUnit {
 	private StorageLocation sourceLeft;
 	private StorageLocation sourceRight;
 	
+	/**
+	 * execute()
+	 * executes the instruction given the operation.
+	 */
     public abstract void execute(Operation operation);
 	
+    
+    /**
+	 * issue()
+	 * sets the functional units destination and sources, given the storage locations.
+	 */
     public void issue(StorageLocation destination, StorageLocation sourceLeft, StorageLocation sourceRight) {
     	setDestination(destination);
 		setSourceLeft(sourceLeft);
 		setSourceRight(sourceRight);
     }
     
+    //lines 41 to 75 are getters and setters for a functional units private variables.
 	public boolean isBusy() {
 		return busy;
 	}
@@ -52,6 +70,15 @@ public abstract class FunctionalUnit {
 		this.busy = busy;
 	}
 
+	public boolean isExecuting(){
+		return this.executing;
+	}
+	
+	
+	/**
+	 * clockCycle()
+	 * if the functional unit is still executing, the clock cycle count increases.
+	 */
 	public void clockCycle() {
 		if (isExecuting()) {
 			this.currClockCount++;
@@ -61,11 +88,19 @@ public abstract class FunctionalUnit {
 		}
 	}
 	
-	
+	/**
+	 * operationFinished()
+	 * returns a boolean of whether the functional unit has finished executing or not
+	 */
 	public boolean operationFinished() {
 		return currClockCount >= countToComplete;
 	}
 	
+	/**
+	 * startOperation()
+	 * Begins the count for the number of clock cycles it takes to execute that specific
+	 * functional unit.
+	 */
 	public void startOperation() {
 		this.currClockCount = 1;
 		if (!operationFinished()) {
@@ -74,10 +109,6 @@ public abstract class FunctionalUnit {
 		else {
 			this.executing = false;
 		}
-	}
-	
-	public boolean isExecuting(){
-		return this.executing;
 	}
 	
 }
