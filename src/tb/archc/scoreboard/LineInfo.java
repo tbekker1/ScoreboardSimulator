@@ -8,8 +8,7 @@ import java.util.StringTokenizer;
  * Class LineInfo:
  * Takes one line from the file, and breaks it into its required elements
  * 
- * Will create objects for the 
- *  lines operation, functional unit, and registers/storage locations.
+ * Describes the line's operation, functional unit, and registers/storage locations.
  */
 public class LineInfo {
 
@@ -106,7 +105,7 @@ public class LineInfo {
 	/**
 	 * issue()
 	 *   
-	 * Issue the line whet it is ready to be issued on its functional unit.  
+	 * Issue the line when it is ready to be issued on its functional unit.  
 	 */
 	public void issue() {
 		getFunctionalUnit().issue(getDestination(), getSourceLeft(), getSourceRight());

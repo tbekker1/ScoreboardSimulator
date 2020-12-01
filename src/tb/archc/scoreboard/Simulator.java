@@ -15,7 +15,7 @@ public class Simulator {
 	
 	/**
 	 * getHardware()
-	 * Instantiates the hardware class (creates all of the registers and memory locations)
+	 * Instantiates the hardware class (creates all of the registers, memory locations, and functional units)
 	 */
 	public static Hardware getHardware() {
 		if (hardware == null) {
@@ -50,7 +50,7 @@ public class Simulator {
 	 * The crux of the program. Parses the lines in the file, 
 	 * calls the LineInfo class to change the string line into objects.
 	 * 
-	 * Each LineInfo contains a single lines required functional unit, registers, operation... etc
+	 * Each LineInfo contains a single line's required functional unit, registers, operation... etc
 	 * 
 	 * It then runs through the entire logic to scoreboard the instructions
 	 *  
@@ -62,7 +62,7 @@ public class Simulator {
 		int clockCounter = 0;
 		int numFinishedInstructions = 0;
 		
-		//continue looping until all of the instructions finish their scoreboarding.
+		//continue looping until all of the instructions finish. Each loop is one clock cycle.
 		while(numFinishedInstructions < instructions.size()) {
 			//increment the clock cycle, and get a new StateManager.
 			clockCounter++;
@@ -207,6 +207,7 @@ public class Simulator {
 			getHardware().getFloatDividerFU().clockCycle();	
 			
 			//manages the requests for a functional unit to be busy, and the usedAsDestination flag.
+			//Also executes the locks for registers
 			stateManager.clockCycle();
 		}
 		

@@ -6,9 +6,10 @@ import tb.archc.scoreboard.storage.StorageLocation;
 /**
  * Class FunctionalUnit:
  * The base class for all of the functional units. Contains the destination and sources StorageLocations
- * Contains a bool for whether the FU is busy, and a bool for if it is executing.
  * 
- * Also contains the current Clock cycle while executing, and the number of clock cycles
+ * Has a busy state, and an executing state.
+ * 
+ * Also contains the current execution cycle count, and the number of clock cycles
  * it takes to finish executing that specific functional unit.
  */
 public abstract class FunctionalUnit {
