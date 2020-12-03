@@ -313,7 +313,9 @@ public class Simulator {
 			String line;
 			while((line=br.readLine())!=null) {
 				LineInfo lInfo = new LineInfo(line);
-				instructions.add(lInfo);
+				if (lInfo.isValidInstruction()) {
+					instructions.add(lInfo);
+				}
 			}
 			br.close();
 			fr.close();

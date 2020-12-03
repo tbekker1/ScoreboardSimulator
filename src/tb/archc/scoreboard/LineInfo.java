@@ -26,7 +26,7 @@ public class LineInfo {
 		StringTokenizer st = new StringTokenizer(line);
 		if (st.hasMoreTokens()) {
 			String token = st.nextToken();
-			
+			this.validInstruction = true;
 			//check what the operation is on the line. Assign the line its operation, 
 			//the functional unit it will use, and call getStorageLocation to assign that
 			//line the registers/memory locations it needs.
@@ -86,6 +86,9 @@ public class LineInfo {
 				this.sourceRight = getStorageLocation(st.nextToken());
 			}
 			
+			else {
+				this.validInstruction = false;
+			}
 	    }
 	}
 	
@@ -100,8 +103,8 @@ public class LineInfo {
 	private int writeClockCycle = 0;
 	private String line = "";
 	private InstructionState state = InstructionState.QUEUED;
-	
-	
+	private boolean validInstruction = false;
+
 	/**
 	 * issue()
 	 *   
@@ -176,6 +179,9 @@ public class LineInfo {
 		return this.line;
 	}
 	
+	public boolean isValidInstruction() {
+		return this.validInstruction;
+	}
 	/**
 	 * getStorageLocation()
 	 * 
